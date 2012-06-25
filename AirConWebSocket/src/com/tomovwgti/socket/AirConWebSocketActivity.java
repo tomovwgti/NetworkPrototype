@@ -37,12 +37,14 @@ public class AirConWebSocketActivity extends Activity {
 
     private SeekBar mControlBar;
     private TextView mControl;
+    private TextView mTempText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        mTempText = (TextView) findViewById(R.id.temprature);
         mControl = (TextView) findViewById(R.id.control);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
         mControlBar.setProgress(0);
@@ -53,17 +55,16 @@ public class AirConWebSocketActivity extends Activity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 mControl.setText(String.valueOf(progress + 19));
 
-                Msg msg = new Msg();
-                msg.setCommand("");
-                msg.setSender("android");
-                msg.setCommand("AirCon");
-                msg.setSetting(progress + 19);
-                String message = JSON.encode(msg);
-                WebSocketManager.send(message);
-                setSetting(progress + 19, Color.BLUE);
-
-                // tempSetting.mSetting = (byte) (progress + 19);
-                // tempSetting.sendData();
+                if (fromUser) {
+                    Msg msg = new Msg();
+                    msg.setCommand("");
+                    msg.setSender("mobile");
+                    msg.setCommand("AirCon");
+                    msg.setSetting(progress + 19);
+                    String message = JSON.encode(msg);
+                    WebSocketManager.send(message);
+                    setSetting(progress + 19, Color.BLUE);
+                }
             }
 
             @Override
@@ -100,7 +101,10 @@ public class AirConWebSocketActivity extends Activity {
                 String str = message.getText();
                 // 設定表示の更新
                 Msg msg = JSON.decode(str, Msg.class);
-                setSetting(msg.getSetting(), Color.GREEN);
+                if (msg.getSetting() != 100) {
+                    setSetting(msg.getSetting(), Color.GREEN);
+                }
+                setTemperature(msg.getTemperature());
             }
 
             @Override
@@ -116,7 +120,18 @@ public class AirConWebSocketActivity extends Activity {
             @Override
             public void run() {
                 mControl.setText(String.valueOf(setting));
+                mControl.setTextColor(color);
                 mControlBar.setProgress(setting - 19);
+            }
+        });
+    }
+
+    private void setTemperature(final int temperature) {
+        // WebSocketHandlerのonMessageは別スレッドなのでhandlerを用いてviewの書き換えを行う
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                mTempText.setText(String.valueOf(temperature));
             }
         });
     }
