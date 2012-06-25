@@ -43,7 +43,7 @@
       <file leaf-file-name="command.js" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/js/command.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="17" selection-start="247" selection-end="247" vertical-scroll-proportion="-0.25290024">
+            <state line="26" column="0" selection-start="614" selection-end="614" vertical-scroll-proportion="0.32134572">
               <folding />
             </state>
           </provider>
@@ -61,8 +61,8 @@
       <list>
         <option value="$PROJECT_DIR$/webcommand.html" />
         <option value="$PROJECT_DIR$/css/font.css" />
-        <option value="$PROJECT_DIR$/js/command.js" />
         <option value="$PROJECT_DIR$/aircon.html" />
+        <option value="$PROJECT_DIR$/js/command.js" />
       </list>
     </option>
   </component>
@@ -325,7 +325,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/js/command.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="17" selection-start="247" selection-end="247" vertical-scroll-proportion="-0.25290024">
+        <state line="26" column="0" selection-start="614" selection-end="614" vertical-scroll-proportion="0.32134572">
           <folding />
         </state>
       </provider>

@@ -15,12 +15,19 @@
  */
 $(function () {
     // WebSocket
-    var ws = new WebSocket('ws://192.168.110.195:8001/');
+    var ws = new WebSocket('ws://192.168.0.2:8001/');
 
     // Message from Server
     ws.onmessage = function (event) {
         var receive_message = JSON.parse(event.data);
         console.log('receive message <-- ' + event.data);
+
+        switch (receive_message.command) {
+            case 'AirCon':
+                $('.jquery-ui-slider-red-value').val(receive_message.setting);
+                $('#jquery-ui-slider-red').slider('value', receive_message.setting);
+                break;
+        }
 
         // Message
         switch (receive_message.message) {
@@ -68,7 +75,7 @@ $(function () {
                     }
 
                     console.log(JSON.stringify(msg));
-//                    ws.send(JSON.stringify(msg));
+                    ws.send(JSON.stringify(msg));
                 }
             } );
             $(inputValue).val($(this).slider('value'));
