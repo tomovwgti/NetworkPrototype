@@ -1,0 +1,101 @@
+/**
+ * Created with JetBrains WebStorm.
+ * User: tomo
+ * Date: 12/04/29
+ * Time: 21:23
+ * To change this template use File | Settings | File Templates.
+ */
+/* JSONの形式は以下のようになっている
+ {
+    "sender":"browser",
+    "command":"led",
+    "led":{
+        "status":false
+    },
+    "light":{
+        "red":255,
+        "green":255,
+        "blue":255
+    },
+    "geo":{
+        "lat":36.744386,
+        "lon":139.457703
+    }
+ }
+ */
+$(function () {
+    // WebSocket
+    var ws = new WebSocket('ws://192.168.110.195:8001/');
+
+    // Message from Server
+    ws.onmessage = function (event) {
+        var receive_message = JSON.parse(event.data);
+        console.log('receive message <-- ' + event.data);
+
+        // Message
+        switch (receive_message.message) {
+            // （」・ω・）」うー！
+            case 'uu':
+                $('#uu').vtoggle();
+                if ($('#uu').css('visibility') === 'visible') {
+                    uu_sound.play();
+                }
+                break;
+            // （／・ω・）／にゃー！
+            case 'nyaa':
+                $('#nyaa').vtoggle();
+                if ($('#nyaa').css('visibility') === 'visible') {
+                    nyaa_sound.play();
+                }
+                break;
+        }
+    }
+
+    $(function() {
+        var msg = {
+            'sender': 'browser',
+            'command': 'light',
+            'light' : {
+                'red': 0,
+                'green': 0,
+                'blue': 0
+            }
+        }
+
+        $('#jquery-ui-slider > div > .jquery-ui-slider-multi').each(function() {
+
+            var value = parseInt($(this).text(),10);
+            var inputValue = '.' + $(this).attr('id') + '-value';
+            $(this).empty().slider( {
+                value: value,
+                range: 'min',
+                min: 19,
+                max: 30,
+                animate: true,
+                slide: function( event, ui ) {
+                    $(inputValue).val(ui.value);
+                    $(inputValue).html(ui.value);
+
+                    if (inputValue === '.jquery-ui-slider-red-value') {
+                        msg.light.red = ui.value;
+                        msg.light.green = $('.jquery-ui-slider-green-value').val();
+                        msg.light.blue = $('.jquery-ui-slider-blue-value').val();
+                    } else if (inputValue === '.jquery-ui-slider-green-value') {
+                        msg.light.red = $('.jquery-ui-slider-red-value').val();
+                        msg.light.green = ui.value;
+                        msg.light.blue = $('.jquery-ui-slider-blue-value').val();
+                    } else {
+                        msg.light.red = $('.jquery-ui-slider-red-value').val();
+                        msg.light.green = $('.jquery-ui-slider-green-value').val();
+                        msg.light.blue = ui.value;
+                    }
+
+                    console.log(JSON.stringify(msg));
+                    ws.send(JSON.stringify(msg));
+                }
+            } );
+            $(inputValue).val($(this).slider('value'));
+            $(inputValue).html($(this).slider('value'));
+        } );
+    } );
+});
