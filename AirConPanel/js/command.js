@@ -8,19 +8,9 @@
 /* JSONの形式は以下のようになっている
  {
     "sender":"browser",
-    "command":"led",
-    "led":{
-        "status":false
-    },
-    "light":{
-        "red":255,
-        "green":255,
-        "blue":255
-    },
-    "geo":{
-        "lat":36.744386,
-        "lon":139.457703
-    }
+    "command":"AirCon",
+    "temperature": 19,
+    "setting": 19
  }
  */
 $(function () {
@@ -54,12 +44,9 @@ $(function () {
     $(function() {
         var msg = {
             'sender': 'browser',
-            'command': 'light',
-            'light' : {
-                'red': 0,
-                'green': 0,
-                'blue': 0
-            }
+            'command': 'AirCon',
+            'temperature': 19,
+            'setting': 19
         }
 
         $('#jquery-ui-slider > div > .jquery-ui-slider-multi').each(function() {
@@ -77,21 +64,11 @@ $(function () {
                     $(inputValue).html(ui.value);
 
                     if (inputValue === '.jquery-ui-slider-red-value') {
-                        msg.light.red = ui.value;
-                        msg.light.green = $('.jquery-ui-slider-green-value').val();
-                        msg.light.blue = $('.jquery-ui-slider-blue-value').val();
-                    } else if (inputValue === '.jquery-ui-slider-green-value') {
-                        msg.light.red = $('.jquery-ui-slider-red-value').val();
-                        msg.light.green = ui.value;
-                        msg.light.blue = $('.jquery-ui-slider-blue-value').val();
-                    } else {
-                        msg.light.red = $('.jquery-ui-slider-red-value').val();
-                        msg.light.green = $('.jquery-ui-slider-green-value').val();
-                        msg.light.blue = ui.value;
+                        msg.setting = ui.value;
                     }
 
                     console.log(JSON.stringify(msg));
-                    ws.send(JSON.stringify(msg));
+//                    ws.send(JSON.stringify(msg));
                 }
             } );
             $(inputValue).val($(this).slider('value'));
