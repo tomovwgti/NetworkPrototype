@@ -15,7 +15,7 @@
  */
 $(function () {
     // WebSocket
-    var ws = new WebSocket('ws://192.168.0.2:8001/');
+    var ws = new WebSocket('ws://192.168.110.195:8001/');
 
     // Message from Server
     ws.onmessage = function (event) {
@@ -26,6 +26,7 @@ $(function () {
             case 'AirCon':
                 $('.jquery-ui-slider-red-value').val(receive_message.setting);
                 $('#jquery-ui-slider-red').slider('value', receive_message.setting);
+                $('#temperature').text(receive_message.temperature);
                 break;
         }
 
@@ -72,6 +73,8 @@ $(function () {
 
                     if (inputValue === '.jquery-ui-slider-red-value') {
                         msg.setting = ui.value;
+//                        $('#temperature').text(ui.value);
+                        msg.temperature = $('#temperature').text();
                     }
 
                     console.log(JSON.stringify(msg));
