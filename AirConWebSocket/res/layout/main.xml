@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-    
+
     <SeekBar
         android:id="@+id/control_bar"
         android:layout_width="match_parent"
@@ -11,51 +11,74 @@
         android:layout_marginTop="50dp" />
 
     <LinearLayout
-	    android:layout_width="fill_parent"
-    	android:layout_height="wrap_content"
-    	android:orientation="horizontal"
-    	android:layout_marginTop="10dp" >
-    
-    <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="設定温度"
-        android:layout_weight="1"
-        android:layout_marginLeft="50dp"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/control"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginLeft="20dp"
-        android:text="不明"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-	</LinearLayout>
-
-    <LinearLayout
-	    android:layout_width="fill_parent"
-    	android:layout_height="fill_parent"
-    	android:layout_marginTop="50dp"
-    	android:orientation="horizontal" >
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
 
         <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="50dp"
-        android:layout_weight="1"
-        android:text="室内温度　"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_weight="1"
+            android:text="設定温度"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/temprature"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_weight="1"
-        android:text="不明"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        <TextView
+            android:id="@+id/control"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:text="不明"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
 
-	</LinearLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="228dp"
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_weight="1"
+            android:text="室内温度　"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            android:id="@+id/temprature"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_weight="1"
+            android:text="不明"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp" >
+
+        <Button
+            android:id="@+id/btn_uu_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="うー" />
+
+        <Button
+            android:id="@+id/btn_nyaa_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="にゃー" />
+    </LinearLayout>
+
 </LinearLayout>

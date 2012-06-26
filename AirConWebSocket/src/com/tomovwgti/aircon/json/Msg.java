@@ -4,8 +4,17 @@ package com.tomovwgti.aircon.json;
 public class Msg {
     String sender;
     String command;
+    String message;
     int temperature;
     int setting;
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 
     public String getSender() {
         return sender;

@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -38,6 +39,12 @@ public class AirConWebSocketActivity extends Activity {
     private SeekBar mControlBar;
     private TextView mControl;
     private TextView mTempText;
+
+    private static final String UU_STR = "uu";
+    private static final String NYAA_STR = "nyaa";
+
+    private static final String UU_TEXT = "(」・ω・)」うー！";
+    private static final String NYAA_TEXT = "(／・ω・)／にゃー！";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +90,35 @@ public class AirConWebSocketActivity extends Activity {
         mAlertDialog = showAlertDialog();
         mAlertDialog.show();
 
+        // うーボタン押下時の挙動
+        Button uuBtn = (Button) findViewById(R.id.btn_uu_btn);
+        uuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Msg msg = new Msg();
+                msg.setCommand("");
+                msg.setSender("android");
+                msg.setCommand("Message");
+                msg.setMessage(UU_STR);
+                String message = JSON.encode(msg);
+                WebSocketManager.send(message);
+            }
+        });
+
+        // にゃーボタン押下時の挙動
+        Button nyaaBtn = (Button) findViewById(R.id.btn_nyaa_btn);
+        nyaaBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Msg msg = new Msg();
+                msg.setCommand("");
+                msg.setSender("android");
+                msg.setCommand("Message");
+                msg.setMessage(NYAA_STR);
+                String message = JSON.encode(msg);
+                WebSocketManager.send(message);
+            }
+        });
     }
 
     private void connectWebSocket() {
