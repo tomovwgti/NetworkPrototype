@@ -43,9 +43,6 @@ public class AirConWebSocketActivity extends Activity {
     private static final String UU_STR = "uu";
     private static final String NYAA_STR = "nyaa";
 
-    private static final String UU_TEXT = "(」・ω・)」うー！";
-    private static final String NYAA_TEXT = "(／・ω・)／にゃー！";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +65,7 @@ public class AirConWebSocketActivity extends Activity {
                     msg.setSender("mobile");
                     msg.setCommand("AirCon");
                     msg.setSetting(progress + 19);
+                    msg.setTemperature(Integer.parseInt(mTempText.getText().toString()));
                     String message = JSON.encode(msg);
                     WebSocketManager.send(message);
                     setSetting(progress + 19, Color.BLUE);

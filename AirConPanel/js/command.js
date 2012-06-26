@@ -15,7 +15,7 @@
  */
 $(function () {
     // WebSocket
-    var ws = new WebSocket('ws://192.168.110.195:8001/');
+    var ws = new WebSocket('ws://192.168.0.2:8001/');
 
     // Message from Server
     ws.onmessage = function (event) {
