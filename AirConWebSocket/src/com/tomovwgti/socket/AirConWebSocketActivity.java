@@ -65,7 +65,11 @@ public class AirConWebSocketActivity extends Activity {
                     msg.setSender("mobile");
                     msg.setCommand("AirCon");
                     msg.setSetting(progress + 19);
-                    msg.setTemperature(Integer.parseInt(mTempText.getText().toString()));
+                    try {
+                        msg.setTemperature(Integer.parseInt(mTempText.getText().toString()));
+                    } catch (NumberFormatException e) {
+                        msg.setTemperature(100);
+                    }
                     String message = JSON.encode(msg);
                     WebSocketManager.send(message);
                     setSetting(progress + 19, Color.BLUE);

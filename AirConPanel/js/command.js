@@ -26,7 +26,11 @@ $(function () {
             case 'AirCon':
                 $('.jquery-ui-slider-red-value').val(receive_message.setting);
                 $('#jquery-ui-slider-red').slider('value', receive_message.setting);
-                $('#temperature').text(receive_message.temperature);
+                if (receive_message.sender !== 'onX') {
+                    if (receive_message.temperature < 40) {
+                        $('#temperature').text(receive_message.temperature);
+                    }
+                }
                 break;
         }
 
