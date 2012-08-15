@@ -14,12 +14,11 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tomovwgti.android.accessory.AccessoryBaseActivity;
 import com.tomovwgti.android.accessory.io.ADKCommandAbstractReceiver;
@@ -29,7 +28,7 @@ import com.tomovwgti.json.Value;
 
 public class AirConActivity extends AccessoryBaseActivity {
     static final String TAG = AirConActivity.class.getSimpleName();
-    
+
     private SocketIOManager mSocketManager;
     private SocketIO mSocket;
     private AlertDialog mAlertDialog;
@@ -49,13 +48,11 @@ public class AirConActivity extends AccessoryBaseActivity {
             switch (msg.what) {
                 case SocketIOManager.SOCKETIO_DISCONNECT:
                     Log.i(TAG, "SOCKETIO_DISCONNECT");
-                    Toast.makeText(AirConActivity.this, "Disconnect", Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(AirConActivity.this, "Disconnect", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_CONNECT:
                     Log.i(TAG, "SOCKETIO_CONNECT");
-                    Toast.makeText(AirConActivity.this, "Connect", Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(AirConActivity.this, "Connect", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_HERTBEAT:
                     Log.i(TAG, "SOCKETIO_HERTBEAT");
@@ -164,7 +161,7 @@ public class AirConActivity extends AccessoryBaseActivity {
         // ADKへ出力
         final Temperature tempSetting = new Temperature();
         tempSetting.mSetting = (byte) msg.getSetting();
-        tempSetting.mTemp = (byte)Integer.parseInt(msg.getTemperature());
+        tempSetting.mTemp = (byte) Integer.parseInt(msg.getTemperature());
         tempSetting.sendData();
         // 変化を反映する
         mHandler.post(new Runnable() {

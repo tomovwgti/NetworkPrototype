@@ -1,3 +1,4 @@
+
 package com.tomovwgti.aircon;
 
 import io.socket.SocketIO;
@@ -6,18 +7,16 @@ import net.arnx.jsonic.JSON;
 
 import org.json.JSONObject;
 
-import com.tomovwgti.json.Msg;
-import com.tomovwgti.json.Value;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.preference.PreferenceManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.preference.PreferenceManager;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,14 +26,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.support.v4.app.NavUtils;
+
+import com.tomovwgti.json.Msg;
+import com.tomovwgti.json.Value;
 
 public class MainActivity extends Activity {
     static final String TAG = MainActivity.class.getSimpleName();
-    
+
     private SocketIOManager mSocketManager;
     private SocketIO mSocket;
     private AlertDialog mAlertDialog;
@@ -47,20 +48,18 @@ public class MainActivity extends Activity {
 
     private static final String UU_STR = "uu";
     private static final String NYAA_STR = "nyaa";
-    
+
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case SocketIOManager.SOCKETIO_DISCONNECT:
                     Log.i(TAG, "SOCKETIO_DISCONNECT");
-                    Toast.makeText(MainActivity.this, "Disconnect", Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(MainActivity.this, "Disconnect", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_CONNECT:
                     Log.i(TAG, "SOCKETIO_CONNECT");
-                    Toast.makeText(MainActivity.this, "Connect", Toast.LENGTH_SHORT)
-                            .show();
+                    Toast.makeText(MainActivity.this, "Connect", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_HERTBEAT:
                     Log.i(TAG, "SOCKETIO_HERTBEAT");
@@ -72,7 +71,7 @@ public class MainActivity extends Activity {
                     Log.i(TAG, "SOCKETIO_JSON_MESSAGE");
                     Value value = JSON.decode((String) (msg.obj), Value.class);
                     // 自分で設定した場合は無視
-                    if ( value.getValue().getSender().equals("mobile") ) {
+                    if (value.getValue().getSender().equals("mobile")) {
                         break;
                     }
                     // 設定表示の更新
@@ -146,7 +145,7 @@ public class MainActivity extends Activity {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
-        });        
+        });
 
         // うーボタン押下時の挙動
         Button uuBtn = (Button) findViewById(R.id.btn_uu_btn);
@@ -206,7 +205,6 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
