@@ -21,7 +21,7 @@ $(function () {
     socket.on('message', function(event) {
 
         var receive_message = event.value;
-        console.log('receive message <-- ' + event.value.sender);
+        console.log('receive message <-- ' + receive_message.sender);
 
         switch (receive_message.command) {
             case 'AirCon':
@@ -82,7 +82,7 @@ $(function () {
                         msg.temperature = $('#temperature').text();
                     }
 
-                    console.log(JSON.stringify(msg));
+                    console.log('send message <-- ' + JSON.stringify(msg));
                     // メッセージを送信する
                     socket.emit('message', { value: msg });
 
