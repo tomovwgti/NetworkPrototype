@@ -77,6 +77,9 @@ public class MainActivity extends Activity {
                     }
                     // 設定表示の更新
                     String str = value.getValue().getTemperature();
+                    if (str == null) {
+                        break;
+                    }
                     if (!str.equals("100")) {
                         setSetting(value.getValue().getSetting(), Color.GREEN);
                     }
