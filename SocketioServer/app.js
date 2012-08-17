@@ -5,36 +5,39 @@
 
 var express = require('express')
   , routes = require('./routes')
+  , path = require('path');
 
-var app = module.exports = express.createServer();
+var app = express()
+    , http = require('http')
+    , server = http.createServer(app)
+    , io = require('socket.io').listen(server);
 
-// Configuration
 
 app.configure(function(){
+  app.set('port', process.env.PORT || 3000);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'ejs');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  app.use(express.cookieParser('your secret here'));
+  app.use(express.session());
   app.use(app.router);
-  app.use(express.static(__dirname + '/public'));
+  app.use(express.static(path.join(__dirname, 'public')));
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  app.use(express.errorHandler());
 });
-
-app.configure('production', function(){
-  app.use(express.errorHandler()); 
-});
-
-// Routes
 
 app.get('/', routes.index);
+
 
 // ソケットを作る
 var socketIO = require('socket.io');
 // クライアントの接続を待つ(IPアドレスとポート番号を結びつけます)
-var io = socketIO.listen(app);
+server.listen(3000);
 
 // クライアントが接続してきたときの処理
 io.sockets.on('connection', function(socket) {
@@ -51,6 +54,3 @@ io.sockets.on('connection', function(socket) {
         console.log("disconnect");
     });
 });
-
-app.listen(3000);
-console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
