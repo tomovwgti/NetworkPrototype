@@ -5,6 +5,7 @@ NetworkPrototype
 * SocketioServer : Node.js + ejs + Socket.IOのサーバ
 * AirConSocketIO : アプリとADK対応のAndroidアプリ
 * forMegaAdkLib : ADK用のライブラリ
+* SampleOnX : On{X}を使ったサンプルアプリ
 
 ### 動作確認済みバージョン
 * Node.js v0.6.6/v0.8.7
