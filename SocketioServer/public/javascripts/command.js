@@ -16,10 +16,28 @@
 $(function () {
     // Socket.IO
     var socket = io.connect();
+    var temperature = new TimeSeries();
+    var setting = new TimeSeries();
+    var line_temp = 19;
+    var line_setting = 19;
+    var options = {
+        'minValue': 19,
+        'maxValue': 30
+    }
+
+    // グラフ
+    var chart = new SmoothieChart(options);
+    chart.addTimeSeries(temperature, { strokeStyle: 'rgba(0, 255, 0, 1)', fillStyle: 'rgba(0, 255, 0, 0)', lineWidth: 4 });
+    chart.addTimeSeries(setting, { strokeStyle: 'rgba(0, 128, 255, 1)', fillStyle: 'rgba(0, 255, 0, 0)', lineWidth: 4 });
+    chart.streamTo(document.getElementById("chart"), 500);
+
+    setInterval(function() {
+        temperature.append(new Date().getTime(), line_temp);
+        setting.append(new Date().getTime(), line_setting);
+    }, 500);
 
     // メッセージを受けたとき
     socket.on('message', function(event) {
-
         var receive_message = event.value;
         console.log('receive message <-- ' + receive_message.sender);
 
@@ -27,6 +45,8 @@ $(function () {
             case 'AirCon':
                 $('.jquery-ui-slider-red-value').val(receive_message.setting);
                 $('#jquery-ui-slider-red').slider('value', receive_message.setting);
+                line_setting = receive_message.setting;
+                line_temp = receive_message.temperature;
                 if (receive_message.sender !== 'onX') {
                     if (receive_message.temperature < 40) {
                         $('#temperature').text(receive_message.temperature);

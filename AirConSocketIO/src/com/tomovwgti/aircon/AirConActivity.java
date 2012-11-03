@@ -63,7 +63,9 @@ public class AirConActivity extends AccessoryBaseActivity {
                 case SocketIOManager.SOCKETIO_JSON_MESSAGE:
                     Log.i(TAG, "SOCKETIO_JSON_MESSAGE");
                     Value value = JSON.decode((String) (msg.obj), Value.class);
-                    executeCommand(value.getValue());
+                    if (value.getValue().getCommand().equals("AirCon")) {
+                        executeCommand(value.getValue());
+                    }
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
                     Log.i(TAG, "SOCKETIO_EVENT");
