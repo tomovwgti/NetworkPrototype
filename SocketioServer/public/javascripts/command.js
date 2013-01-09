@@ -43,14 +43,18 @@ $(function () {
 
         switch (receive_message.command) {
             case 'AirCon':
+/*
                 $('.jquery-ui-slider-red-value').val(receive_message.setting);
                 $('#jquery-ui-slider-red').slider('value', receive_message.setting);
+*/
                 line_setting = receive_message.setting;
                 line_temp = receive_message.temperature;
                 if (receive_message.sender !== 'onX') {
                     if (receive_message.temperature < 40) {
                         $('#temperature').text(receive_message.temperature);
                     }
+                    // ノブの更新
+                    $('#knob').val(receive_message.setting).trigger('change');;
                 }
                 break;
         }
@@ -73,7 +77,7 @@ $(function () {
                 break;
         }
     });
-
+/* slider
     $(function() {
         var msg = {
             'sender': 'browser',
@@ -112,4 +116,23 @@ $(function () {
             $(inputValue).html($(this).slider('value'));
         } );
     } );
+*/
+    $(function() {
+        var msg = {
+            'sender': 'browser',
+            'command': 'AirCon',
+            'temperature': 19,
+            'setting': 19
+        }
+
+        $('#knob').knob({
+            'change' : function(value) {
+                msg.setting = value;
+                msg.temperature = $('#temperature').text();
+                console.log('send message <-- ' + JSON.stringify(msg));
+                // メッセージを送信する
+                socket.emit('message', { value: msg });
+            }
+        });
+    });
 });
