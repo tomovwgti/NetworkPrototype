@@ -10,11 +10,16 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.util.Log;
@@ -194,9 +199,40 @@ public class MainActivity extends Activity {
         pref = PreferenceManager.getDefaultSharedPreferences(this);
         editor = pref.edit();
 
-        // IPアドレス確認ダイアログ
-        mAlertDialog = showAlertDialog();
-        mAlertDialog.show();
+        Intent intent = getIntent();
+        if (intent.getAction().equals(Intent.ACTION_MAIN)) {
+            // IPアドレス確認ダイアログ
+            mAlertDialog = showAlertDialog();
+            mAlertDialog.show();
+        } else if (intent.getAction().equals(NfcAdapter.ACTION_NDEF_DISCOVERED)) {
+            // NFCで起動された
+            getNdefMessage(intent);
+        }
+    }
+
+    private void getNdefMessage(Intent intent) {
+        Parcelable[] raws = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+        NdefMessage[] msgs = new NdefMessage[raws.length];
+        String str = "";
+        byte[] payload = null;
+        for (int i = 0; i < raws.length; i++) {
+            msgs[i] = (NdefMessage) raws[i];
+            for (NdefRecord record : msgs[i].getRecords()) {
+                str += "Type : " + new String(record.getType()) + "\n";
+                str += "TNF : " + record.getTnf() + "\n";
+                payload = record.getPayload();
+                if (payload == null)
+                    break;
+            }
+        }
+        // ペイロードからURLを取り出す
+        String url = "";
+        for (int i = 13; i < payload.length; i++) {
+            url += String.format("%c", payload[i]);
+        }
+        Log.d("URL", url);
+        // IPV6での接続
+        mSocket = mSocketManager.connect("http://" + url + ":3000/");
     }
 
     @Override

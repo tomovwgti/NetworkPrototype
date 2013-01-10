@@ -49,12 +49,12 @@ $(function () {
 */
                 line_setting = receive_message.setting;
                 line_temp = receive_message.temperature;
-                if (receive_message.sender !== 'onX') {
+                if (receive_message.sender !== 'onX' || receive_message.sender !== 'browser') {
                     if (receive_message.temperature < 40) {
                         $('#temperature').text(receive_message.temperature);
                     }
                     // ノブの更新
-                    $('#knob').val(receive_message.setting).trigger('change');;
+                    $('#knob').val(receive_message.setting).trigger('change');
                 }
                 break;
         }
