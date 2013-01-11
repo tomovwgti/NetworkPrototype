@@ -109,6 +109,10 @@ public class MainActivity extends Activity {
 
         mSocketManager = new SocketIOManager(mHandler);
 
+        findViewById(R.id.outside_temperature_text).setVisibility(View.INVISIBLE);
+        findViewById(R.id.outside_temprature).setVisibility(View.INVISIBLE);
+        findViewById(R.id.address).setVisibility(View.INVISIBLE);
+
         mTempText = (TextView) findViewById(R.id.temprature);
         mControl = (TextView) findViewById(R.id.control);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
@@ -233,6 +237,11 @@ public class MainActivity extends Activity {
         Log.d("URL", url);
         // IPV6での接続
         mSocket = mSocketManager.connect("http://" + url + ":3000/");
+        // プレファレンスへの書き込み
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this)
+                .edit();
+        editor.putString("IPADDRESS", url);
+        editor.commit();
     }
 
     @Override

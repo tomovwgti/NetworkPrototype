@@ -33,15 +33,19 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 
-
-// ソケットを作る
-var socketIO = require('socket.io');
 // クライアントの接続を待つ(IPアドレスとポート番号を結びつけます)
 server.listen(3000);
 
+var sidMap = {};
+
 // クライアントが接続してきたときの処理
 io.sockets.on('connection', function(socket) {
+    sidMap[socket.id] = 'browser';
     console.log("connection");
+
+    for (var i in sidMap) {
+        console.log("connect: " + sidMap[i]);
+    }
     // メッセージを受けたときの処理
     socket.on('message', function(data) {
         // つながっているクライアント全員に送信
@@ -51,6 +55,8 @@ io.sockets.on('connection', function(socket) {
 
     // クライアントが切断したときの処理
     socket.on('disconnect', function(){
+        console.log("disconnect: " + socket.id);
+        delete sidMap[socket.id];
         console.log("disconnect");
     });
 });

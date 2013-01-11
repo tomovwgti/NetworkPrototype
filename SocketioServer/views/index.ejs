@@ -6,13 +6,9 @@
 
     <script src="/javascripts/jquery-1.7.2.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-<!--
-    <script src="/javascripts/jquery-ui-1.8.19.custom.min.js"></script>
--->
     <script src="/javascripts/jquery.vtoggle.js"></script>
     <script src="/javascripts/jquery.knob.js"></script>
     <script src="/javascripts/command.js"></script>
-    <script src="/javascripts/smoothie.js"></script>
 
     <link rel="stylesheet" href="/stylesheets/base/jquery.ui.all.css">
     <link rel="stylesheet" href="/stylesheets/slider.css">
@@ -21,23 +17,10 @@
   </head>
   <body>
     <H1><span class="black bg-white xx-large bold">エアコンの設定画面</span></H1>
-<!--
-    <section id="jquery-ui-slider" >
-        <div class="jquery-ui-slider-item ">
-            <div class="jquery-ui-slider-title float-left "><span class="black medium bold">温度設定：</span></div>
-            <div class="float-left"><input type="text" class="jquery-ui-slider-red-value" /></div>
-            <div class="jquery-ui-slider-multi float-left" id="jquery-ui-slider-red">0</div>
-            <div class="float-clear"></div>
-        </div>
-    </section>
--->
     <section>
         <div id="jquery-knob">
                 <input id="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#66EE66" value="19" data-min="19" data-max="30">
         </div>
-    </section>
-    <section>
-        <canvas id="chart" width="400" height="100"></canvas>
     </section>
     <section>
         <span class="red bg-white big-size bold" id="temperature">温度</span><span  class="red bg-white big-size bold">℃</span>

@@ -5,8 +5,13 @@ import io.socket.SocketIO;
 import io.socket.util.SocketIOManager;
 import net.arnx.jsonic.JSON;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.preference.PreferenceManager;
@@ -25,8 +30,18 @@ import com.tomovwgti.android.accessory.io.ADKCommandAbstractReceiver;
 import com.tomovwgti.android.accessory.io.ADKCommandReceiver;
 import com.tomovwgti.json.Msg;
 import com.tomovwgti.json.Value;
+import com.tomovwgti.weather.PlaceLoader;
+import com.tomovwgti.weather.PlaceLoader.PlaceListener;
+import com.tomovwgti.weather.WeatherOnlineLoader;
+import com.tomovwgti.weather.WeatherOnlineLoader.WeatherOnlineListener;
 
-public class AirConActivity extends AccessoryBaseActivity {
+/**
+ * ADK接続時のActivity
+ * 
+ * @author tomo
+ */
+public class AirConActivity extends AccessoryBaseActivity implements WeatherOnlineListener,
+        PlaceListener, LocationListener {
     static final String TAG = AirConActivity.class.getSimpleName();
 
     private SocketIOManager mSocketManager;
@@ -41,6 +56,14 @@ public class AirConActivity extends AccessoryBaseActivity {
     private int mTemperature;
 
     private int currentProgress;
+
+    private LocationManager mLocationManager;
+    private WeatherOnlineLoader mWeatherLoader;
+    private PlaceLoader mPlaceLoader;
+    private ProgressDialog mProgress;
+
+    private byte mOutsideTemp;
+    private String mAddress;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -133,6 +156,30 @@ public class AirConActivity extends AccessoryBaseActivity {
         });
     }
 
+    private void startLocation() {
+        mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        mWeatherLoader = new WeatherOnlineLoader(this);
+        mPlaceLoader = new PlaceLoader(this);
+
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("情報取得中...");
+        mProgress.show();
+
+        if (mLocationManager != null) {
+            mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
+        }
+    }
+
+    @Override
+    protected void onPauseActivity() {
+        if (mLocationManager != null) {
+            mLocationManager.removeUpdates(this);
+        }
+        if (mProgress != null) {
+            mProgress.dismiss();
+        }
+    }
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -162,7 +209,8 @@ public class AirConActivity extends AccessoryBaseActivity {
     private void executeCommand(final Msg msg) {
         // ADKへ出力
         final Temperature tempSetting = new Temperature();
-        tempSetting.mSetting = (byte) msg.getSetting();
+        // tempSetting.mSetting = (byte) msg.getSetting();
+        tempSetting.mSetting = (byte) mOutsideTemp;
         tempSetting.mTemp = (byte) Integer.parseInt(msg.getTemperature());
         tempSetting.sendData();
         // 変化を反映する
@@ -170,7 +218,8 @@ public class AirConActivity extends AccessoryBaseActivity {
             @Override
             public void run() {
                 mControl.setText(String.valueOf(msg.getSetting()));
-                tempSetting.mSetting = (byte) (msg.getSetting() - 19);
+                // tempSetting.mSetting = (byte) (msg.getSetting() - 19);
+                tempSetting.mSetting = (byte) mOutsideTemp;
                 mControlBar.setProgress(msg.getSetting() - 19);
             }
         });
@@ -205,6 +254,8 @@ public class AirConActivity extends AccessoryBaseActivity {
                             mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
                             // AlertDialogを閉じます
                             mAlertDialog.dismiss();
+                            // 位置情報取得と気温取得開始
+                            startLocation();
                         }
                         return true;
                     }
@@ -223,7 +274,71 @@ public class AirConActivity extends AccessoryBaseActivity {
                         editor.putString("IPADDRESS", editStr);
                         editor.commit();
                         mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
+                        // 位置情報取得と気温取得開始
+                        startLocation();
                     }
                 }).create();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        mLocationManager.removeUpdates(this);
+        if (mLocationManager == null) {
+            // 位置取得キャンセル
+            return;
+        }
+        mLocationManager = null;
+
+        String lat = String.valueOf(location.getLatitude());
+        String lon = String.valueOf(location.getLongitude());
+
+        // 天気情報
+        mWeatherLoader.execute(lat, lon);
+        // 位置情報取得
+        mPlaceLoader.execute(lat, lon);
+
+        Log.v("----------", "----------");
+        Log.v("Latitude", String.valueOf(location.getLatitude()));
+        Log.v("Longitude", String.valueOf(location.getLongitude()));
+        Log.v("Accuracy", String.valueOf(location.getAccuracy()));
+        Log.v("Altitude", String.valueOf(location.getAltitude()));
+        Log.v("Time", String.valueOf(location.getTime()));
+        Log.v("Speed", String.valueOf(location.getSpeed()));
+        Log.v("Bearing", String.valueOf(location.getBearing()));
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void viewResult(String place) {
+        TextView address = (TextView) findViewById(R.id.address);
+        address.setText(place);
+    }
+
+    @Override
+    public void viewResult(String temp, String weather, String imageUrl) {
+        mProgress.dismiss();
+        int outside = Integer.valueOf(temp);
+        mOutsideTemp = (byte) (outside);
+        Log.v("気温 : ", temp + " ℃");
+        Log.v("天気 : ", weather);
+        TextView outsideTemp = (TextView) findViewById(R.id.outside_temprature);
+        outsideTemp.setText(temp + " ℃");
     }
 }
