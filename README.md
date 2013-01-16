@@ -27,46 +27,47 @@ NetworkPrototype
 		$ nvm ls
 
 * JSON
-[Aircon] : エアコン設定
-{
-	"sneder" : "browser",
-	"command" : "Aircon",
-	"setting" : 25,
-}
 
-[Temperature] : 室内気温
-{
-	"sender" : "mobile",
-	"command" : "Temperature",
-	"temperature" : 28,
-}
+		[Aircon] : エアコン設定
+		{
+			"sneder" : "browser",
+			"command" : "Aircon",
+			"setting" : 25,
+		}
 
-[Outside] : 外気温
-{
-	"sender" : "mobile",
-	"command" : "Outside",
-	"outside" : 10,
-}
+		[Temperature] : 室内気温
+		{
+			"sender" : "mobile",
+			"command" : "Temperature",
+			"temperature" : 28,
+		}
 
-[Sound]
-{
-	"sender" : "mobile",
-	"command" : "Sound",
-	"message" : "uu"
-}
+		[Outside] : 外気温
+		{
+			"sender" : "mobile",
+			"command" : "Outside",
+			"outside" : 10,
+		}
 
-[Connection]
-{
-	"sender" : "mobile",
-	"command" : "Connection",
-	"type" : "connect"
-	"devices" : 2,
-}
+		[Sound]
+		{
+			"sender" : "mobile",
+			"command" : "Sound",
+			"message" : "uu"
+		}
 
-[Addrsss]
-{
-	"sender" : "android",
-	"command" : "Address",
-	"address" : "渋谷区""
-}
+		[Connection]
+		{
+			"sender" : "mobile",
+			"command" : "Connection",
+			"type" : "connect"
+			"devices" : 2,
+		}
+
+		[Addrsss]
+		{
+			"sender" : "android",
+			"command" : "Address",
+			"address" : "渋谷区""
+		}
 
