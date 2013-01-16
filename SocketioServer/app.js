@@ -36,7 +36,8 @@ app.get('/', routes.index);
 // クライアントの接続を待つ(IPアドレスとポート番号を結びつけます)
 server.listen(3000);
 
-var sidMap = {};
+// 接続端末情報
+var sidMap = new Object();
 
 // クライアントが接続してきたときの処理
 io.sockets.on('connection', function(socket) {
@@ -48,8 +49,14 @@ io.sockets.on('connection', function(socket) {
     }
     // メッセージを受けたときの処理
     socket.on('message', function(data) {
+        data.value.devices = getLength();
+        console.log(data.value.devices);
+        if (data.value.command === 'Connection') {
+            if (data.value.type === 'disconnect') {
+                data.value.devices--;
+            }
+        }
         // つながっているクライアント全員に送信
-        console.log('setting ' + data.value.setting);
         io.sockets.emit('message', { value: data.value });
     });
 
@@ -58,5 +65,14 @@ io.sockets.on('connection', function(socket) {
         console.log("disconnect: " + socket.id);
         delete sidMap[socket.id];
         console.log("disconnect");
+        // 長さを取るだけ
+        console.log("connect: " + getLength());
     });
 });
+
+// サイズの取得
+function getLength() {
+    var length = 0;
+    for(var i in sidMap ){ length++; }
+    return length;
+}

@@ -35,8 +35,10 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.tomovwgti.json.Msg;
-import com.tomovwgti.json.Value;
+import com.tomovwgti.json.AirconJson;
+import com.tomovwgti.json.ConnectionJson;
+import com.tomovwgti.json.SoundJson;
+import com.tomovwgti.json.TemperatureJson;
 
 public class MainActivity extends Activity {
     static final String TAG = MainActivity.class.getSimpleName();
@@ -64,6 +66,19 @@ public class MainActivity extends Activity {
                     break;
                 case SocketIOManager.SOCKETIO_CONNECT:
                     Log.i(TAG, "SOCKETIO_CONNECT");
+                    ConnectionJson value = new ConnectionJson();
+                    ConnectionJson.Connection connectionJson = value.new Connection();
+                    connectionJson.setCommand("Connection");
+                    connectionJson.setSender("mobile");
+                    connectionJson.setType("connect");
+                    value.setValue(connectionJson);
+                    String message = JSON.encode(value);
+                    try {
+                        mSocket.emit("message", new JSONObject(message));
+                    } catch (org.json.JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                     Toast.makeText(MainActivity.this, "Connect", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_HERTBEAT:
@@ -74,20 +89,31 @@ public class MainActivity extends Activity {
                     break;
                 case SocketIOManager.SOCKETIO_JSON_MESSAGE:
                     Log.i(TAG, "SOCKETIO_JSON_MESSAGE");
-                    Value value = JSON.decode((String) (msg.obj), Value.class);
-                    // 自分で設定した場合は無視
-                    if (value.getValue().getSender().equals("mobile")) {
+                    AirconJson airconJson = JSON.decode((String) (msg.obj), AirconJson.class);
+                    // 設定値が変更された
+                    if (airconJson.getValue().getCommand().equals("Aircon")) {
+                        // 自分で設定した場合は無視
+                        if (airconJson.getValue().getSender().equals("mobile")) {
+                            break;
+                        }
+                        // 設定表示の更新
+                        String str = String.valueOf(airconJson.getValue().getSetting());
+                        if (str == null) {
+                            break;
+                        }
+                        if (!str.equals("100")) {
+                            setSetting(airconJson.getValue().getSetting(), Color.GREEN);
+                        }
                         break;
+                    } else
+                    // 室内温度の取得
+                    if (airconJson.getValue().getCommand().equals("Temperature")) {
+                        // 取得しなおし
+                        TemperatureJson temperatureJson = JSON.decode((String) (msg.obj),
+                                TemperatureJson.class);
+                        // 温度表示の更新
+                        setTemperature(String.valueOf(temperatureJson.getValue().getTemperature()));
                     }
-                    // 設定表示の更新
-                    String str = value.getValue().getTemperature();
-                    if (str == null) {
-                        break;
-                    }
-                    if (!str.equals("100")) {
-                        setSetting(value.getValue().getSetting(), Color.GREEN);
-                    }
-                    setTemperature(str);
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
                     Log.i(TAG, "SOCKETIO_EVENT");
@@ -113,7 +139,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.outside_temprature).setVisibility(View.INVISIBLE);
         findViewById(R.id.address).setVisibility(View.INVISIBLE);
 
-        mTempText = (TextView) findViewById(R.id.temprature);
+        mTempText = (TextView) findViewById(R.id.temperature);
         mControl = (TextView) findViewById(R.id.control);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
         mControlBar.setProgress(0);
@@ -124,18 +150,12 @@ public class MainActivity extends Activity {
                 mControl.setText(String.valueOf(progress + 19));
 
                 if (fromUser) {
-                    Value value = new Value();
-                    Msg msg = new Msg();
-                    msg.setCommand("");
-                    msg.setSender("mobile");
-                    msg.setCommand("AirCon");
-                    msg.setSetting(progress + 19);
-                    try {
-                        msg.setTemperature(mTempText.getText().toString());
-                    } catch (NumberFormatException e) {
-                        msg.setTemperature("100");
-                    }
-                    value.setValue(msg);
+                    AirconJson value = new AirconJson();
+                    AirconJson.Aircon airconJson = value.new Aircon();
+                    airconJson.setCommand("Aircon");
+                    airconJson.setSender("mobile");
+                    airconJson.setSetting(progress + 19);
+                    value.setValue(airconJson);
                     String message = JSON.encode(value);
                     try {
                         mSocket.emit("message", new JSONObject(message));
@@ -161,16 +181,15 @@ public class MainActivity extends Activity {
         uuBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Value value = new Value();
-                Msg msg = new Msg();
-                msg.setCommand("");
-                msg.setSender("android");
-                msg.setCommand("Message");
-                msg.setMessage(UU_STR);
-                value.setValue(msg);
-                String message = JSON.encode(value);
+                SoundJson value = new SoundJson();
+                SoundJson.Sound soundJson = value.new Sound();
+                soundJson.setCommand("Sound");
+                soundJson.setSender("mobile");
+                soundJson.setMessage(UU_STR);
+                value.setValue(soundJson);
+                String sendMessage = JSON.encode(value);
                 try {
-                    mSocket.emit("message", new JSONObject(message));
+                    mSocket.emit("message", new JSONObject(sendMessage));
                 } catch (org.json.JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -183,16 +202,15 @@ public class MainActivity extends Activity {
         nyaaBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Value value = new Value();
-                Msg msg = new Msg();
-                msg.setCommand("");
-                msg.setSender("android");
-                msg.setCommand("Message");
-                msg.setMessage(NYAA_STR);
-                value.setValue(msg);
-                String message = JSON.encode(value);
+                SoundJson value = new SoundJson();
+                SoundJson.Sound soundJson = value.new Sound();
+                soundJson.setCommand("Sound");
+                soundJson.setSender("mobile");
+                soundJson.setMessage(NYAA_STR);
+                value.setValue(soundJson);
+                String sendMessage = JSON.encode(value);
                 try {
-                    mSocket.emit("message", new JSONObject(message));
+                    mSocket.emit("message", new JSONObject(sendMessage));
                 } catch (org.json.JSONException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -263,6 +281,22 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
+
+        // 切断メッセージ送信
+        ConnectionJson value = new ConnectionJson();
+        ConnectionJson.Connection connectionJson = value.new Connection();
+        connectionJson.setCommand("Connection");
+        connectionJson.setSender("mobile");
+        connectionJson.setType("disconnect");
+        value.setValue(connectionJson);
+        String sendDisconnect = JSON.encode(value);
+        try {
+            mSocket.emit("message", new JSONObject(sendDisconnect));
+        } catch (org.json.JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         mSocketManager.disconnect();
     }
 

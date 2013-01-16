@@ -2,16 +2,15 @@
 package com.tomovwgti.aircon;
 
 import io.socket.SocketIO;
+import net.arnx.jsonic.JSON;
 
 import org.json.JSONObject;
 
-import net.arnx.jsonic.JSON;
 import android.app.Activity;
 
 import com.tomovwgti.android.accessory.io.InputDataListener;
 import com.tomovwgti.android.accessory.io.OutputData;
-import com.tomovwgti.json.Msg;
-import com.tomovwgti.json.Value;
+import com.tomovwgti.json.TemperatureJson;
 
 public class Temperature extends OutputData implements InputDataListener {
     static final String TAG = Temperature.class.getSimpleName();
@@ -44,14 +43,18 @@ public class Temperature extends OutputData implements InputDataListener {
         sendCommand(TEMPERATURE_COMMAND, mSetting, 0);
     }
 
+    /**
+     * 気温設定値を送信
+     * 
+     * @param socket
+     */
     public void sendWebSocket(SocketIO socket) {
-        Value value = new Value();
-        Msg msg = new Msg();
-        msg.setCommand("AirCon");
-        msg.setSender("android");
-        msg.setSetting(mSetting);
-        msg.setTemperature(String.valueOf(mTemp));
-        value.setValue(msg);
+        TemperatureJson value = new TemperatureJson();
+        TemperatureJson.Temperature temperatureJson = value.new Temperature();
+        temperatureJson.setCommand("Temperature");
+        temperatureJson.setSender("mobile");
+        temperatureJson.setTemperature(mTemp);
+        value.setValue(temperatureJson);
         String message = JSON.encode(value);
         try {
             socket.emit("message", new JSONObject(message));

@@ -4,6 +4,9 @@ package com.tomovwgti.aircon;
 import io.socket.SocketIO;
 import io.socket.util.SocketIOManager;
 import net.arnx.jsonic.JSON;
+
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -28,8 +31,9 @@ import android.widget.Toast;
 import com.tomovwgti.android.accessory.AccessoryBaseActivity;
 import com.tomovwgti.android.accessory.io.ADKCommandAbstractReceiver;
 import com.tomovwgti.android.accessory.io.ADKCommandReceiver;
-import com.tomovwgti.json.Msg;
-import com.tomovwgti.json.Value;
+import com.tomovwgti.json.AddressJson;
+import com.tomovwgti.json.AirconJson;
+import com.tomovwgti.json.OutsideJson;
 import com.tomovwgti.weather.PlaceLoader;
 import com.tomovwgti.weather.PlaceLoader.PlaceListener;
 import com.tomovwgti.weather.WeatherOnlineLoader;
@@ -62,9 +66,6 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
     private PlaceLoader mPlaceLoader;
     private ProgressDialog mProgress;
 
-    private byte mOutsideTemp;
-    private String mAddress;
-
     private Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -85,9 +86,11 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                     break;
                 case SocketIOManager.SOCKETIO_JSON_MESSAGE:
                     Log.i(TAG, "SOCKETIO_JSON_MESSAGE");
-                    Value value = JSON.decode((String) (msg.obj), Value.class);
-                    if (value.getValue().getCommand().equals("AirCon")) {
-                        executeCommand(value.getValue());
+                    // スライダーの変化だけ
+                    AirconJson value = JSON.decode(((String) msg.obj), AirconJson.class);
+                    if (value.getValue().getCommand().equals("Aircon")) {
+                        mControl.setText(String.valueOf(value.getValue().getSetting()));
+                        mControlBar.setProgress(value.getValue().getSetting() - 19);
                     }
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
@@ -121,13 +124,10 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         mAlertDialog = showAlertDialog();
         mAlertDialog.show();
 
-        // 設定用
-        final Temperature tempSetting = new Temperature();
-
         findViewById(R.id.btn_uu_btn).setVisibility(View.INVISIBLE);
         findViewById(R.id.btn_nyaa_btn).setVisibility(View.INVISIBLE);
         mControl = (TextView) findViewById(R.id.control);
-        mTemp = (TextView) findViewById(R.id.temprature);
+        mTemp = (TextView) findViewById(R.id.temperature);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
         mControlBar.setProgress(0);
         mControlBar.setMax(11);
@@ -137,12 +137,20 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                 currentProgress = progress;
                 if (fromUser) {
                     mControl.setText(String.valueOf(progress + 19));
-                    tempSetting.mSetting = (byte) (progress + 19);
-                    tempSetting.mTemp = mTemperature;
-                    // ADK出力
-                    tempSetting.sendData();
-                    // WebSocket送信
-                    tempSetting.sendWebSocket(mSocket);
+                    // 設定値をWebSocketで送信
+                    AirconJson value = new AirconJson();
+                    AirconJson.Aircon airconJson = value.new Aircon();
+                    airconJson.setCommand("Aircon");
+                    airconJson.setSender("mobile");
+                    airconJson.setSetting(progress + 19);
+                    value.setValue(airconJson);
+                    String message = JSON.encode(value);
+                    try {
+                        mSocket.emit("message", new JSONObject(message));
+                    } catch (org.json.JSONException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -194,35 +202,12 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         mTemperature = Integer.parseInt(temprature);
         mTemp.setText(temprature);
         if (sendFlag == 10) {
-            // WebSocket送信
-            tempSetting.mSetting = (byte) (currentProgress + 19);
+            // 10回に1回WebSocket送信
             tempSetting.mTemp = mTemperature;
             tempSetting.sendWebSocket(mSocket);
             sendFlag = 0;
         }
         sendFlag++;
-    }
-
-    /**
-     * AirConコマンドを受けた時の処理
-     */
-    private void executeCommand(final Msg msg) {
-        // ADKへ出力
-        final Temperature tempSetting = new Temperature();
-        // tempSetting.mSetting = (byte) msg.getSetting();
-        tempSetting.mSetting = (byte) mOutsideTemp;
-        tempSetting.mTemp = (byte) Integer.parseInt(msg.getTemperature());
-        tempSetting.sendData();
-        // 変化を反映する
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                mControl.setText(String.valueOf(msg.getSetting()));
-                // tempSetting.mSetting = (byte) (msg.getSetting() - 19);
-                tempSetting.mSetting = (byte) mOutsideTemp;
-                mControlBar.setProgress(msg.getSetting() - 19);
-            }
-        });
     }
 
     private AlertDialog showAlertDialog() {
@@ -329,16 +314,48 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
     public void viewResult(String place) {
         TextView address = (TextView) findViewById(R.id.address);
         address.setText(place);
+        // 住所
+        AddressJson value = new AddressJson();
+        AddressJson.Address addressJson = value.new Address();
+        addressJson.setSender("mobile");
+        addressJson.setCommand("Address");
+        addressJson.setAddress(place);
+        value.setValue(addressJson);
+        String message = JSON.encode(value);
+        try {
+            mSocket.emit("message", new JSONObject(message));
+        } catch (org.json.JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void viewResult(String temp, String weather, String imageUrl) {
         mProgress.dismiss();
         int outside = Integer.valueOf(temp);
-        mOutsideTemp = (byte) (outside);
         Log.v("気温 : ", temp + " ℃");
         Log.v("天気 : ", weather);
-        TextView outsideTemp = (TextView) findViewById(R.id.outside_temprature);
-        outsideTemp.setText(temp + " ℃");
+        TextView outsideTempText = (TextView) findViewById(R.id.outside_temprature);
+        outsideTempText.setText(temp + " ℃");
+        // 外気温をADKへ出力
+        final Temperature tempSetting = new Temperature();
+        tempSetting.mSetting = (byte) (outside);
+        tempSetting.sendData();
+
+        // 外気温
+        OutsideJson value = new OutsideJson();
+        OutsideJson.Outside outsideJson = value.new Outside();
+        outsideJson.setCommand("Outside");
+        outsideJson.setOutside(outside);
+        outsideJson.setSender("mobile");
+        value.setValue(outsideJson);
+        String message = JSON.encode(value);
+        try {
+            mSocket.emit("message", new JSONObject(message));
+        } catch (org.json.JSONException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 }
