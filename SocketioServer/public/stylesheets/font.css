@@ -51,7 +51,7 @@
 .xx-small { font-size:xx-small; }
 .larger { font-size:larger; }
 .smaller { font-size:smaller; }
-.big-size {font-size:150px;}
+.big-size {font-size:60px;}
 
 /* 書体等 */
 .normal { font-weight:normal;font-style:normal;text-decoration:none; }

@@ -167,20 +167,20 @@ $(function () {
     // Addressコマンド
     function addressCommand(receive_message) {
         console.log(receive_message.address);
-        $('#address').append("場所: " + receive_message.address + '<br>');
+        $('#address').text("場所: " + receive_message.address);
     }
 
     // Temperatureコマンド <--- 温度センサの値
     function temperatureCommand(receive_message) {
         console.log(receive_message.temperature);
         if (receive_message.temperature < 40) {
-            $('#temperature').text(receive_message.temperature);
+            $('#temperature').text("気温: " + receive_message.temperature + "℃");
         }
     }
 
     // Outsideコマンド <-- 外気温
     function outsideCommand(receive_message) {
         console.log(receive_message.outside);
-        $('#outside_temp').replaceWith("外気温: " + receive_message.outside + '<br>');
+        $('#outside').text("外気温: " + receive_message.outside + "℃");
     }
 });
