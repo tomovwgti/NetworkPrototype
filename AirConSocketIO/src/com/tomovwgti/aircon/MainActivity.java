@@ -120,6 +120,7 @@ public class MainActivity extends Activity {
                     break;
                 case SocketIOManager.SOCKETIO_ERROR:
                     Log.i(TAG, "SOCKETIO_ERROR");
+                    Toast.makeText(MainActivity.this, "Connect Error!!", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_ACK:
                     Log.i(TAG, "SOCKETIO_ACK");

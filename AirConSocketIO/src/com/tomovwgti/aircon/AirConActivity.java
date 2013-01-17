@@ -58,8 +58,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
     private TextView mControl;
     private SeekBar mControlBar;
     private int mTemperature;
-
-    private int currentProgress;
+    private String mPlace;
+    private int mOutSide;
 
     private LocationManager mLocationManager;
     private WeatherOnlineLoader mWeatherLoader;
@@ -98,6 +98,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                     break;
                 case SocketIOManager.SOCKETIO_ERROR:
                     Log.i(TAG, "SOCKETIO_ERROR");
+                    Toast.makeText(AirConActivity.this, "Connect Error!!", Toast.LENGTH_SHORT)
+                            .show();
                     break;
                 case SocketIOManager.SOCKETIO_ACK:
                     Log.i(TAG, "SOCKETIO_ACK");
@@ -134,7 +136,6 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         mControlBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                currentProgress = progress;
                 if (fromUser) {
                     mControl.setText(String.valueOf(progress + 19));
                     // 設定値をWebSocketで送信
@@ -194,20 +195,12 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         mSocketManager.disconnect();
     }
 
-    private int sendFlag = 0;
-
     public void viewTemprature(String temprature) {
-        // 設定用
         final Temperature tempSetting = new Temperature();
         mTemperature = Integer.parseInt(temprature);
         mTemp.setText(temprature);
-        if (sendFlag == 10) {
-            // 10回に1回WebSocket送信
-            tempSetting.mTemp = mTemperature;
-            tempSetting.sendWebSocket(mSocket);
-            sendFlag = 0;
-        }
-        sendFlag++;
+        tempSetting.mTemp = mTemperature;
+        tempSetting.sendWebSocket(mSocket);
     }
 
     private AlertDialog showAlertDialog() {
@@ -314,12 +307,35 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
     public void viewResult(String place) {
         TextView address = (TextView) findViewById(R.id.address);
         address.setText(place);
-        // 住所
+        mPlace = place;
+        // 住所の送信
+        sendAddress();
+    }
+
+    @Override
+    public void viewResult(String temp, String weather, String imageUrl) {
+        mProgress.dismiss();
+        mOutSide = Integer.valueOf(temp);
+        Log.v("気温 : ", temp + " ℃");
+        Log.v("天気 : ", weather);
+        TextView outsideTempText = (TextView) findViewById(R.id.outside_temprature);
+        outsideTempText.setText(temp + " ℃");
+        // 外気温をADKへ出力
+        final Temperature tempSetting = new Temperature();
+        tempSetting.mSetting = (byte) (mOutSide);
+        tempSetting.sendData();
+
+        // 外気温の送信
+        sendOutside();
+    }
+
+    // 住所の送信
+    public void sendAddress() {
         AddressJson value = new AddressJson();
         AddressJson.Address addressJson = value.new Address();
         addressJson.setSender("mobile");
         addressJson.setCommand("Address");
-        addressJson.setAddress(place);
+        addressJson.setAddress(mPlace);
         value.setValue(addressJson);
         String message = JSON.encode(value);
         try {
@@ -330,24 +346,12 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         }
     }
 
-    @Override
-    public void viewResult(String temp, String weather, String imageUrl) {
-        mProgress.dismiss();
-        int outside = Integer.valueOf(temp);
-        Log.v("気温 : ", temp + " ℃");
-        Log.v("天気 : ", weather);
-        TextView outsideTempText = (TextView) findViewById(R.id.outside_temprature);
-        outsideTempText.setText(temp + " ℃");
-        // 外気温をADKへ出力
-        final Temperature tempSetting = new Temperature();
-        tempSetting.mSetting = (byte) (outside);
-        tempSetting.sendData();
-
-        // 外気温
+    // 外気温の送信
+    public void sendOutside() {
         OutsideJson value = new OutsideJson();
         OutsideJson.Outside outsideJson = value.new Outside();
         outsideJson.setCommand("Outside");
-        outsideJson.setOutside(outside);
+        outsideJson.setOutside(mOutSide);
         outsideJson.setSender("mobile");
         value.setValue(outsideJson);
         String message = JSON.encode(value);

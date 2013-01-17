@@ -24,6 +24,8 @@ public class Temperature extends OutputData implements InputDataListener {
     public byte mSetting = 0;
     public int mTemp = 0;;
 
+    private static int sendCount = 0;;
+
     public Temperature() {
         this.mActivity = null;
     }
@@ -35,7 +37,14 @@ public class Temperature extends OutputData implements InputDataListener {
 
     @Override
     public void handleMassage() {
-        mActivity.viewTemprature(String.valueOf(mTemp));
+        // 10回呼ばれたら1回送信する
+        if (sendCount == 10) {
+            mActivity.viewTemprature(String.valueOf(mTemp));
+            mActivity.sendAddress();
+            mActivity.sendOutside();
+            sendCount = 0;
+        }
+        sendCount++;
     }
 
     @Override
