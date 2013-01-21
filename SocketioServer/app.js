@@ -34,7 +34,7 @@ app.configure('development', function(){
 app.get('/', routes.index);
 
 // クライアントの接続を待つ(IPアドレスとポート番号を結びつけます)
-server.listen(3000);
+server.listen(app.get('port'));
 
 // 接続端末情報
 var sidMap = new Object();
