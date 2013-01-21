@@ -58,8 +58,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
     private TextView mControl;
     private SeekBar mControlBar;
     private int mTemperature;
-    private String mPlace;
-    private int mOutSide;
+    private String mPlace = null;
+    private int mOutSide = -100;
 
     private LocationManager mLocationManager;
     private WeatherOnlineLoader mWeatherLoader;
@@ -243,19 +243,30 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         });
 
         // AlertDialog作成
-        return new AlertDialog.Builder(this).setTitle("Server IP Address").setView(entryView)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String editStr = edit.getText().toString();
-                        // OKボタン押下時のハンドリング
-                        Log.v(TAG, editStr);
-                        editor.putString("IPADDRESS", editStr);
-                        editor.commit();
-                        mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
-                        // 位置情報取得と気温取得開始
-                        startLocation();
-                    }
-                }).create();
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Server IP Address")
+                .setView(entryView);
+        dialog.setPositiveButton("PORT:3000", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String editStr = edit.getText().toString();
+                // OKボタン押下時のハンドリング
+                Log.v(TAG, editStr);
+                editor.putString("IPADDRESS", editStr);
+                editor.commit();
+                mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
+            }
+        });
+        dialog.setNegativeButton("PORT:80", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String editStr = edit.getText().toString();
+                // OKボタン押下時のハンドリング
+                Log.v(TAG, editStr);
+                editor.putString("IPADDRESS", editStr);
+                editor.commit();
+                mSocket = mSocketManager.connect("http://" + editStr + "/");
+            }
+        });
+
+        return dialog.create();
     }
 
     @Override
@@ -331,6 +342,10 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
 
     // 住所の送信
     public void sendAddress() {
+        if (mPlace == null) {
+            // 住所未確定
+            return;
+        }
         AddressJson value = new AddressJson();
         AddressJson.Address addressJson = value.new Address();
         addressJson.setSender("mobile");
@@ -348,6 +363,10 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
 
     // 外気温の送信
     public void sendOutside() {
+        if (mOutSide == -100) {
+            // 外気温未確定
+            return;
+        }
         OutsideJson value = new OutsideJson();
         OutsideJson.Outside outsideJson = value.new Outside();
         outsideJson.setCommand("Outside");

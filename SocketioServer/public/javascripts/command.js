@@ -30,7 +30,7 @@
  "sender" : "android",
  "command" : "Temperature",
  "temperature" : 10,
- "address" : "渋谷区""
+ "address" : "渋谷区"
  }
 
  [Sound]

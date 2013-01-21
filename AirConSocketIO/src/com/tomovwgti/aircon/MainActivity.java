@@ -361,16 +361,29 @@ public class MainActivity extends Activity {
         });
 
         // AlertDialog作成
-        return new AlertDialog.Builder(this).setTitle("Server IP Address").setView(entryView)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        String editStr = edit.getText().toString();
-                        // OKボタン押下時のハンドリング
-                        Log.v(TAG, editStr);
-                        editor.putString("IPADDRESS", editStr);
-                        editor.commit();
-                        mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
-                    }
-                }).create();
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this).setTitle("Server IP Address")
+                .setView(entryView);
+        dialog.setPositiveButton("PORT:3000", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String editStr = edit.getText().toString();
+                // OKボタン押下時のハンドリング
+                Log.v(TAG, editStr);
+                editor.putString("IPADDRESS", editStr);
+                editor.commit();
+                mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
+            }
+        });
+        dialog.setNegativeButton("PORT:80", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String editStr = edit.getText().toString();
+                // OKボタン押下時のハンドリング
+                Log.v(TAG, editStr);
+                editor.putString("IPADDRESS", editStr);
+                editor.commit();
+                mSocket = mSocketManager.connect("http://" + editStr + "/");
+            }
+        });
+
+        return dialog.create();
     }
 }
