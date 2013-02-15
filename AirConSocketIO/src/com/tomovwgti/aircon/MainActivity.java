@@ -93,7 +93,6 @@ public class MainActivity extends Activity {
                     Log.i(TAG, "SOCKETIO_MESSAGE");
                     break;
                 case SocketIOManager.SOCKETIO_JSON_MESSAGE:
-                    Log.i(TAG, "SOCKETIO_JSON_MESSAGE");
                     AirconJson airconJson = JSON.decode((String) (msg.obj), AirconJson.class);
                     // 設定値が変更された
                     if (airconJson.getValue().getCommand().equals("Aircon")) {
@@ -118,6 +117,7 @@ public class MainActivity extends Activity {
                                 TemperatureJson.class);
                         // 温度表示の更新
                         setTemperature(String.valueOf(temperatureJson.getValue().getTemperature()));
+                        break;
                     }
                     // USB電源の取得
                     PowerJson powerJson = JSON.decode((String) (msg.obj), PowerJson.class);
@@ -158,18 +158,18 @@ public class MainActivity extends Activity {
         mControl = (TextView) findViewById(R.id.control);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
         mControlBar.setProgress(0);
-        mControlBar.setMax(11);
+        mControlBar.setMax(20);
         mControlBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                mControl.setText(String.valueOf(progress + 19));
+                mControl.setText(String.valueOf(progress));
 
                 if (fromUser) {
                     AirconJson value = new AirconJson();
                     AirconJson.Aircon airconJson = value.new Aircon();
                     airconJson.setCommand("Aircon");
                     airconJson.setSender("mobile");
-                    airconJson.setSetting(progress + 19);
+                    airconJson.setSetting(progress);
                     value.setValue(airconJson);
                     String message = JSON.encode(value);
                     try {
@@ -178,7 +178,7 @@ public class MainActivity extends Activity {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    setSetting(progress + 19, Color.BLUE);
+                    setSetting(progress, Color.BLUE);
                 }
             }
 
@@ -344,7 +344,7 @@ public class MainActivity extends Activity {
             public void run() {
                 mControl.setText(String.valueOf(setting));
                 mControl.setTextColor(color);
-                mControlBar.setProgress(setting - 19);
+                mControlBar.setProgress(setting);
             }
         });
     }

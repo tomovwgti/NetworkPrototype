@@ -90,7 +90,7 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                     AirconJson value = JSON.decode(((String) msg.obj), AirconJson.class);
                     if (value.getValue().getCommand().equals("Aircon")) {
                         mControl.setText(String.valueOf(value.getValue().getSetting()));
-                        mControlBar.setProgress(value.getValue().getSetting() - 19);
+                        mControlBar.setProgress(value.getValue().getSetting());
                     }
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
@@ -137,13 +137,13 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    mControl.setText(String.valueOf(progress + 19));
+                    mControl.setText(String.valueOf(progress));
                     // 設定値をWebSocketで送信
                     AirconJson value = new AirconJson();
                     AirconJson.Aircon airconJson = value.new Aircon();
                     airconJson.setCommand("Aircon");
                     airconJson.setSender("mobile");
-                    airconJson.setSetting(progress + 19);
+                    airconJson.setSetting(progress);
                     value.setValue(airconJson);
                     String message = JSON.encode(value);
                     try {
