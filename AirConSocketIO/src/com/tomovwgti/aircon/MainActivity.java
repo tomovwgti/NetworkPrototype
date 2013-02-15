@@ -29,14 +29,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.tomovwgti.json.AirconJson;
 import com.tomovwgti.json.ConnectionJson;
+import com.tomovwgti.json.PowerJson;
 import com.tomovwgti.json.SoundJson;
 import com.tomovwgti.json.TemperatureJson;
 
@@ -52,6 +56,7 @@ public class MainActivity extends Activity {
     private SeekBar mControlBar;
     private TextView mControl;
     private TextView mTempText;
+    private Switch mPowerSwitch;
 
     private static final String UU_STR = "uu";
     private static final String NYAA_STR = "nyaa";
@@ -113,6 +118,15 @@ public class MainActivity extends Activity {
                                 TemperatureJson.class);
                         // 温度表示の更新
                         setTemperature(String.valueOf(temperatureJson.getValue().getTemperature()));
+                    }
+                    // USB電源の取得
+                    PowerJson powerJson = JSON.decode((String) (msg.obj), PowerJson.class);
+                    if (powerJson.getValue().getCommand().equals("Power")) {
+                        if (powerJson.getValue().getOnoff() == 1) {
+                            mPowerSwitch.setChecked(true);
+                        } else {
+                            mPowerSwitch.setChecked(false);
+                        }
                     }
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
@@ -209,6 +223,28 @@ public class MainActivity extends Activity {
                 soundJson.setSender("mobile");
                 soundJson.setMessage(NYAA_STR);
                 value.setValue(soundJson);
+                String sendMessage = JSON.encode(value);
+                try {
+                    mSocket.emit("message", new JSONObject(sendMessage));
+                } catch (org.json.JSONException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        // USB電源スイッチ
+        mPowerSwitch = (Switch) findViewById(R.id.power);
+        mPowerSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                Log.i(TAG, "" + isChecked);
+                PowerJson value = new PowerJson();
+                PowerJson.Power powerJson = value.new Power();
+                powerJson.setCommand("Power");
+                powerJson.setSender("mobile");
+                powerJson.setOnoff(isChecked == true ? 1 : 0);
+                value.setValue(powerJson);
                 String sendMessage = JSON.encode(value);
                 try {
                     mSocket.emit("message", new JSONObject(sendMessage));
