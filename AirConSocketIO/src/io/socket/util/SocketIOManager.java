@@ -10,6 +10,7 @@ import java.net.MalformedURLException;
 
 import org.json.JSONObject;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -90,6 +91,12 @@ public class SocketIOManager implements IOCallback {
         Log.i(TAG, "Server triggered event '" + event + "'");
         if (event.equals("message")) {
             onMessage((JSONObject) args[0], null);
+        } else if (isHandler()) {
+            Bundle bundle = new Bundle();
+            bundle.putString("SOCKETIO_EVENT", event);
+            Message msg = sHandler.obtainMessage(SOCKETIO_EVENT, (JSONObject) args[0]);
+            msg.setData(bundle);
+            sHandler.sendMessage(msg);
         }
     }
 

@@ -71,19 +71,7 @@ public class MainActivity extends Activity {
                     break;
                 case SocketIOManager.SOCKETIO_CONNECT:
                     Log.i(TAG, "SOCKETIO_CONNECT");
-                    ConnectionJson value = new ConnectionJson();
-                    ConnectionJson.Connection connectionJson = value.new Connection();
-                    connectionJson.setCommand("Connection");
-                    connectionJson.setSender("mobile");
-                    connectionJson.setType("connect");
-                    value.setValue(connectionJson);
-                    String message = JSON.encode(value);
-                    try {
-                        mSocket.emit("message", new JSONObject(message));
-                    } catch (org.json.JSONException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    connected(msg);
                     Toast.makeText(MainActivity.this, "Connect", Toast.LENGTH_SHORT).show();
                     break;
                 case SocketIOManager.SOCKETIO_HERTBEAT:
@@ -132,6 +120,7 @@ public class MainActivity extends Activity {
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
                     Log.i(TAG, "SOCKETIO_EVENT");
+                    String event = msg.getData().getString("SOCKETIO_EVENT");
                     break;
                 case SocketIOManager.SOCKETIO_ERROR:
                     Log.i(TAG, "SOCKETIO_ERROR");
@@ -140,6 +129,22 @@ public class MainActivity extends Activity {
                 case SocketIOManager.SOCKETIO_ACK:
                     Log.i(TAG, "SOCKETIO_ACK");
                     break;
+            }
+        }
+
+        void connected(Message msg) {
+            ConnectionJson value = new ConnectionJson();
+            ConnectionJson.Connection connectionJson = value.new Connection();
+            connectionJson.setCommand("Connection");
+            connectionJson.setSender("mobile");
+            connectionJson.setType("connect");
+            value.setValue(connectionJson);
+            String message = JSON.encode(value);
+            try {
+                mSocket.emit("connected", new JSONObject(message));
+            } catch (org.json.JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
     };
@@ -328,7 +333,7 @@ public class MainActivity extends Activity {
         value.setValue(connectionJson);
         String sendDisconnect = JSON.encode(value);
         try {
-            mSocket.emit("message", new JSONObject(sendDisconnect));
+            mSocket.emit("disconnected", new JSONObject(sendDisconnect));
         } catch (org.json.JSONException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
