@@ -128,11 +128,13 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
 
         findViewById(R.id.btn_uu_btn).setVisibility(View.INVISIBLE);
         findViewById(R.id.btn_nyaa_btn).setVisibility(View.INVISIBLE);
+        findViewById(R.id.power).setVisibility(View.INVISIBLE);
+
         mControl = (TextView) findViewById(R.id.control);
         mTemp = (TextView) findViewById(R.id.temperature);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
         mControlBar.setProgress(0);
-        mControlBar.setMax(11);
+        mControlBar.setMax(20);
         mControlBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -253,6 +255,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                 editor.putString("IPADDRESS", editStr);
                 editor.commit();
                 mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
+                // 位置情報取得と気温取得開始
+                startLocation();
             }
         });
         dialog.setNegativeButton("PORT:80", new DialogInterface.OnClickListener() {
@@ -263,6 +267,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                 editor.putString("IPADDRESS", editStr);
                 editor.commit();
                 mSocket = mSocketManager.connect("http://" + editStr + "/");
+                // 位置情報取得と気温取得開始
+                startLocation();
             }
         });
 
