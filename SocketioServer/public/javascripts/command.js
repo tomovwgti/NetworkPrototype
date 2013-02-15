@@ -114,7 +114,7 @@ $(function () {
                 msg.setting = value;
                 console.log('send message <-- ' + JSON.stringify(msg));
                 // メッセージを送信する
-                socket.emit('message', { value: msg });
+                socket.json.emit('message', { value: msg });
             }
         });
 
@@ -133,7 +133,7 @@ $(function () {
         msg.type = 'connect';
         // メッセージを送信する
 //        socket.emit('message', { value: msg });
-        socket.emit('connected', { value: msg });
+        socket.json.emit('connected', { value: msg });
     }
 
     // ブラウザ終了イベント
@@ -145,7 +145,7 @@ $(function () {
         msg.type = 'disconnect';
         // メッセージを送信する
 //        socket.emit('message', { value: msg });
-        socket.emit('disconnected', { value: msg });
+        socket.json.emit('disconnected', { value: msg });
     }
 
     // Airconコマンド

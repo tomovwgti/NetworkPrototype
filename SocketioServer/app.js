@@ -54,7 +54,7 @@ io.sockets.on('connection', function(socket) {
     // メッセージを受けたときの処理
     socket.on('message', function(data) {
         // つながっているクライアント全員に送信
-        socket.broadcast.emit('message', { value: data.value });
+        socket.json.broadcast.emit('message', { value: data.value });
     });
 
     // 接続してきた時の処理
@@ -85,7 +85,7 @@ io.sockets.on('connection', function(socket) {
             Model.count({}, function(err, count) {
                 data.value.devices = count;
                 // つながっているクライアント全員に送信
-                io.sockets.emit('connected', { value: data.value });
+                io.sockets.json.emit('connected', { value: data.value });
             });
         });
     }
@@ -97,7 +97,7 @@ io.sockets.on('connection', function(socket) {
             Model.count({}, function(err, count) {
                 data.value.devices = count;
                 // つながっているクライアント全員に送信
-                io.sockets.emit('disconnected', { value: data.value });
+                io.sockets.json.emit('disconnected', { value: data.value });
             });
         });
     }
@@ -116,5 +116,5 @@ app.get('/api/sensor', function(req, res){
     msg.temperature = req.query.value;
     msg.setting = req.query.value;
     // つながっているクライアント全員に送信
-    io.sockets.emit('message', { value: msg });
+    io.sockets.json.emit('message', { value: msg });
 });
