@@ -10,16 +10,32 @@
     <script src="/javascripts/jquery.knob.js"></script>
     <script src="/javascripts/command.js"></script>
 
-    <link rel="stylesheet" href="/stylesheets/base/jquery.ui.all.css">
-    <link rel="stylesheet" href="/stylesheets/slider.css">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <link rel="stylesheet" href="/stylesheets/flipswitch.css">
     <link rel="stylesheet" type="text/css" href="/stylesheets/font.css">
 
   </head>
   <body>
-    <H1><span class="black bg-white xx-large bold">エアコンの設定画面</span></H1>
+    <H1><span class="black bg-white xx-large bold">リアルタイムWeb デモ</span></H1>
+    <section>
+        <div>
+            <span class="blue bg-white large bold" id="arduino-datetime">時刻:</span>
+            <br>
+            <span class="blue bg-white large bold" id="arduino-temp">気温:</span>
+        </div>
+    </section>
     <section>
         <div id="jquery-knob">
-                <input id="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#66EE66" value="19" data-min="19" data-max="30">
+            <input id="knob" data-angleOffset=-125 data-angleArc=250 data-fgColor="#66EE66" value="0" data-min="0" data-max="20">
+        </div>
+    </section>
+    <section>
+        <div class="onoffswitch">
+            <input type="checkbox" name="onoffswitch" class="onoffswitch-checkbox" id="myonoffswitch" checked>
+            <label class="onoffswitch-label" for="myonoffswitch">
+                <div class="onoffswitch-inner"></div>
+                <div class="onoffswitch-switch"></div>
+            </label>
         </div>
     </section>
     <section>

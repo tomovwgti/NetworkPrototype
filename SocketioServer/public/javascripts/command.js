@@ -51,12 +51,26 @@
 $(function () {
     // Socket.IO
     var socket = io.connect();
-    var line_temp = 19;
-    var line_setting = 19;
+    var line_setting = 0;
     var options = {
-        'minValue': 19,
-        'maxValue': 30
+        'minValue': 0,
+        'maxValue': 20
     }
+
+    // 接続イベント受信
+    socket.on('connected', function(event) {
+        var receive_message = event.value;
+        console.log('receive message <-- ' + receive_message.sender);
+        console.log("Command : Connection");
+        connectionCommand(receive_message);
+    });
+
+    // 切断イベント受信
+    socket.on('disconnected', function(event) {
+        var receive_message = event.value;
+        console.log("Command : Connection");
+        connectionCommand(receive_message);
+    });
 
     // メッセージを受けたとき
     socket.on('message', function(event) {
@@ -67,10 +81,6 @@ $(function () {
             case 'Aircon':
                 console.log("Command : Aircon");
                 airconCommand(receive_message);
-                break;
-            case 'Connection':
-                console.log("Command : Connection");
-                connectionCommand(receive_message);
                 break;
             case 'Sound':
                 console.log("Command : Sound");
@@ -88,6 +98,10 @@ $(function () {
                 console.log("Command : Outside");
                 outsideCommand(receive_message)
                 break;
+            case '3gsensor':
+                console.log("Command : 3gsensor");
+                sensorCommand(receive_message)
+                break;
         }
     });
 
@@ -103,6 +117,11 @@ $(function () {
                 socket.emit('message', { value: msg });
             }
         });
+
+        $('#myonoffswitch').click(function() {
+            checked = $("#myonoffswitch").checked();
+            console.log('click ' + checked);
+        });
     });
 
     // ブラウザ接続イベント
@@ -113,7 +132,8 @@ $(function () {
         msg.command = 'Connection';
         msg.type = 'connect';
         // メッセージを送信する
-        socket.emit('message', { value: msg });
+//        socket.emit('message', { value: msg });
+        socket.emit('connected', { value: msg });
     }
 
     // ブラウザ終了イベント
@@ -124,7 +144,8 @@ $(function () {
         msg.command = 'Connection';
         msg.type = 'disconnect';
         // メッセージを送信する
-        socket.emit('message', { value: msg });
+//        socket.emit('message', { value: msg });
+        socket.emit('disconnected', { value: msg });
     }
 
     // Airconコマンド
@@ -183,4 +204,17 @@ $(function () {
         console.log(receive_message.outside);
         $('#outside').text("外気温: " + receive_message.outside + "℃");
     }
+
+    // Sensorコマンド <-- 3Gシールド
+    function sensorCommand(receive_message) {
+        console.log(receive_message.date);
+        console.log(receive_message.time);
+        console.log(receive_message.temperature);
+        $('#arduino-datetime').text("時刻: " + receive_message.date + " " + receive_message.time);
+        $('#arduino-temp').text("気温: " + receive_message.temperature + "℃");
+    }
 });
+
+jQuery.fn.checked = function(){
+    return jQuery(this).attr('checked');
+}

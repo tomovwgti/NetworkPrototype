@@ -90,7 +90,7 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                     AirconJson value = JSON.decode(((String) msg.obj), AirconJson.class);
                     if (value.getValue().getCommand().equals("Aircon")) {
                         mControl.setText(String.valueOf(value.getValue().getSetting()));
-                        mControlBar.setProgress(value.getValue().getSetting() - 19);
+                        mControlBar.setProgress(value.getValue().getSetting());
                     }
                     break;
                 case SocketIOManager.SOCKETIO_EVENT:
@@ -132,18 +132,18 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
         mTemp = (TextView) findViewById(R.id.temperature);
         mControlBar = (SeekBar) findViewById(R.id.control_bar);
         mControlBar.setProgress(0);
-        mControlBar.setMax(11);
+        mControlBar.setMax(20);
         mControlBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    mControl.setText(String.valueOf(progress + 19));
+                    mControl.setText(String.valueOf(progress));
                     // 設定値をWebSocketで送信
                     AirconJson value = new AirconJson();
                     AirconJson.Aircon airconJson = value.new Aircon();
                     airconJson.setCommand("Aircon");
                     airconJson.setSender("mobile");
-                    airconJson.setSetting(progress + 19);
+                    airconJson.setSetting(progress);
                     value.setValue(airconJson);
                     String message = JSON.encode(value);
                     try {
@@ -253,6 +253,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                 editor.putString("IPADDRESS", editStr);
                 editor.commit();
                 mSocket = mSocketManager.connect("http://" + editStr + ":3000/");
+                // 位置情報取得と気温取得開始
+                startLocation();
             }
         });
         dialog.setNegativeButton("PORT:80", new DialogInterface.OnClickListener() {
@@ -263,6 +265,8 @@ public class AirConActivity extends AccessoryBaseActivity implements WeatherOnli
                 editor.putString("IPADDRESS", editStr);
                 editor.commit();
                 mSocket = mSocketManager.connect("http://" + editStr + "/");
+                // 位置情報取得と気温取得開始
+                startLocation();
             }
         });
 

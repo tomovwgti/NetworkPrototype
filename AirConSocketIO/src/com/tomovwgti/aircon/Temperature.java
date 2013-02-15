@@ -37,8 +37,8 @@ public class Temperature extends OutputData implements InputDataListener {
 
     @Override
     public void handleMassage() {
-        // 10回呼ばれたら1回送信する
-        if (sendCount == 10) {
+        // 50回呼ばれたら1回送信する
+        if (sendCount == 50) {
             mActivity.viewTemprature(String.valueOf(mTemp));
             mActivity.sendAddress();
             mActivity.sendOutside();
