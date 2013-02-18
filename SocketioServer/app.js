@@ -17,7 +17,8 @@ var app = express()
 
 var DemoSchema = new mongoose.Schema({
     device: String,
-    uuid: String
+    uuid: String,
+    device_id: String
 });
 
 var Model = db.model('demo', DemoSchema);
@@ -69,11 +70,19 @@ io.sockets.on('connection', function(socket) {
         unregisterDB(data);
     });
 
+    socket.on('get nickname', function() {
+        socket.get('nickname', function(err, name) {
+            socket.emit('name', name);
+        });
+    });
+
     // DBへの登録
     function registerDB(data) {
         var devices = new Model();
         devices.device = data.value.sender;
         devices.uuid = socket.id;
+        devices.device_id = data.value.id;
+        console.log('DEVCIE ID: ' + devices.device_id);
 
         // 保存
         devices.save(function(err) {
@@ -86,6 +95,10 @@ io.sockets.on('connection', function(socket) {
                 data.value.devices = count;
                 // つながっているクライアント全員に送信
                 io.sockets.json.emit('connected', { value: data.value });
+            });
+
+            Model.find({}, function(err, docs) {
+                console.log(docs);
             });
         });
     }

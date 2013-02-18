@@ -63,6 +63,10 @@ $(function () {
         console.log('receive message <-- ' + receive_message.sender);
         console.log("Command : Connection");
         connectionCommand(receive_message);
+        // Androidデバイスが接続したら登録する
+        if (receive_message.id) {
+            $('#options').prepend("<option value=" + receive_message.id + ">" + receive_message.id + "</option>");
+        }
     });
 
     // 切断イベント受信
@@ -70,6 +74,10 @@ $(function () {
         var receive_message = event.value;
         console.log("Command : Connection");
         connectionCommand(receive_message);
+        // Androidデバイスが切断したら削除する
+        if (receive_message.id) {
+            $('option[value=' + receive_message.id +']').remove();
+        }
     });
 
     // メッセージを受けたとき
@@ -118,9 +126,17 @@ $(function () {
             }
         });
 
+        // Power ON/OFF
         $('#myonoffswitch').click(function() {
             checked = $("#myonoffswitch").checked();
             console.log('click ' + checked);
+        });
+
+        // 位置情報取得
+        $('#request').click(function() {
+            var device = $('#options[name="device"]').val();
+            console.log(device);
+
         });
     });
 
@@ -132,7 +148,6 @@ $(function () {
         msg.command = 'Connection';
         msg.type = 'connect';
         // メッセージを送信する
-//        socket.emit('message', { value: msg });
         socket.json.emit('connected', { value: msg });
     }
 
@@ -144,7 +159,6 @@ $(function () {
         msg.command = 'Connection';
         msg.type = 'disconnect';
         // メッセージを送信する
-//        socket.emit('message', { value: msg });
         socket.json.emit('disconnected', { value: msg });
     }
 
@@ -162,6 +176,9 @@ $(function () {
             // メッセージを画面に表示する
             $('#receiveMsg').prepend("接続されました: " + receive_message.sender + '<br>');
             $('#receiveMsg').prepend("接続数: " + receive_message.devices + '<br>');
+            if (receive_message.id) {
+                $('#receiveMsg').prepend("デバイス: " + receive_message.id + '<br>');
+            }
         } else if (receive_message.type === 'disconnect') {
             console.log("disconnect");
             $('#receiveMsg').prepend("切断されました: " + receive_message.sender + '<br>');

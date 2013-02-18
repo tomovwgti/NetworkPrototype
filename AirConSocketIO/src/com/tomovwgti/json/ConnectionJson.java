@@ -17,6 +17,7 @@ public class ConnectionJson {
 
     public class Connection extends MsgBaseJson {
         String type;
+        String id;
 
         public String getType() {
             return type;
@@ -24,6 +25,14 @@ public class ConnectionJson {
 
         public void setType(String type) {
             this.type = type;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
         }
     }
 }

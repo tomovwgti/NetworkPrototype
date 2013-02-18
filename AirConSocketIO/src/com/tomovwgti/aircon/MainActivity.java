@@ -138,6 +138,7 @@ public class MainActivity extends Activity {
             connectionJson.setCommand("Connection");
             connectionJson.setSender("mobile");
             connectionJson.setType("connect");
+            connectionJson.setId("NEXUS");
             value.setValue(connectionJson);
             String message = JSON.encode(value);
             try {
@@ -330,6 +331,7 @@ public class MainActivity extends Activity {
         connectionJson.setCommand("Connection");
         connectionJson.setSender("mobile");
         connectionJson.setType("disconnect");
+        connectionJson.setId("NEXUS");
         value.setValue(connectionJson);
         String sendDisconnect = JSON.encode(value);
         try {
